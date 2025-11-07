@@ -108,13 +108,16 @@ class SignalApp:
 
     def plot_gaussian(self):
         n = self.n.get()
-        seed = np.random.randint(2**32 - 1)
-        self.seed.set(seed)
-        self.t = np.linspace(0, self.duration, n)  # same time vector
+        
+        seed = int(self.seed.get())
+        if seed == 0:
+          seed = int(np.random.randint(0, np.iinfo(np.int32).max))
+          self.seed.set(seed)
+
 
         mu = self.mu.get()
         sigma = self.sigma.get()
-        np.random.default_rng(seed)
+        np.random.seed(seed)
 
         noise = np.random.normal(mu, sigma, n)
         self.gaussiannoise = noise

@@ -53,7 +53,7 @@ class SignalApp:
         ttk.Label(frame_controls, text="Amplitude:").pack(pady=5)
         tk.Entry(frame_controls, textvariable=self.amplitude, width=10).pack()
 
-        ttk.Label(frame_controls, text="Frequency:").pack(pady=5)
+        ttk.Label(frame_controls, text="Frequency (Hz):").pack(pady=5)
         tk.Entry(frame_controls, textvariable=self.frequency, width=10).pack()
 
         ttk.Label(frame_controls, text="Phase:").pack(pady=5)
@@ -78,8 +78,8 @@ class SignalApp:
 
         self.sine_ax.clear()
         self.sine_ax.plot(self.t, y, color='blue')
-        self.sine_ax.set_title(f'Senoidal ({n} puntos)')
-        self.sine_ax.set_xlabel('Tiempo (s)')
+        self.sine_ax.set_title(f'Sinusoidal ({n} samples)')
+        self.sine_ax.set_xlabel('Time (s)')
         self.sine_ax.set_ylabel('Amplitud')
         self.sine_ax.grid(True)
         self.sine_canvas.draw()
@@ -121,9 +121,9 @@ class SignalApp:
 
         self.gauss_ax.clear()
         self.gauss_ax.plot(self.t, noise, color='gray')
-        self.gauss_ax.set_title("Ruido Gaussiano")
-        self.gauss_ax.set_xlabel("Tiempo (s)")
-        self.gauss_ax.set_ylabel("Amplitud")
+        self.gauss_ax.set_title("Gaussian Noise")
+        self.gauss_ax.set_xlabel("Time (s)")
+        self.gauss_ax.set_ylabel("Amplitude")
         self.gauss_ax.grid(True)
         self.gauss_canvas.draw()
 
@@ -144,12 +144,12 @@ class SignalApp:
         y_total = y + noise
 
         self.combo_ax.clear()
-        self.combo_ax.plot(self.t, y, 'b--', label='Seno puro')
-        self.combo_ax.plot(self.t, noise, color='gray', alpha=0.5, label='Ruido gaussiano')
-        self.combo_ax.plot(self.t, y_total, 'r-', linewidth=2, label='Seno + Ruido')
-        self.combo_ax.set_title(f'Seno con Ruido Gaussiano ({n} puntos)')
-        self.combo_ax.set_xlabel('Tiempo (s)')
-        self.combo_ax.set_ylabel('Amplitud')
+        self.combo_ax.plot(self.t, y, 'b--', label='Sinusoidal')
+        self.combo_ax.plot(self.t, noise, color='gray', alpha=0.5, label='Gaussian noise')
+        self.combo_ax.plot(self.t, y_total, 'r-', linewidth=2, label='Signal + Noise')
+        self.combo_ax.set_title(f'Signal with Gaussian Noise ({n} samples)')
+        self.combo_ax.set_xlabel('Time (s)')
+        self.combo_ax.set_ylabel('Amplitude')
         self.combo_ax.legend()
         self.combo_ax.grid(True)
         self.combo_canvas.draw()

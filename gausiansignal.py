@@ -1,6 +1,6 @@
 # Import necessary libraries
 import tkinter as tk                        # Library for creating graphical user interfaces (GUI)
-from tkinter import ttk                     # Themed widgets extension for tkinter
+from tkinter import ttk, filedialog                     # Themed widgets extension for tkinter
 import numpy as np                          # Library for numerical operations and arrays
 import matplotlib.pyplot as plt              # Library for plotting
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Embeds matplotlib figures in Tkinter
@@ -18,10 +18,12 @@ class SignalApp:
         self.tab2 = ttk.Frame(self.tab_control)                               # Tab 2 (Gaussian Noise)
         self.tab3 = ttk.Frame(self.tab_control)                               # Tab 3 (Combined)
         self.tab4 = ttk.Frame(self.tab_control)                               # NEW: Amplitude Table (freq on X, amplitude on Y)
+        self.tab5 = ttk.Frame(self.tab_control)
         self.tab_control.add(self.tab1, text='Sinusoidal')                    # Add Sinusoidal tab
         self.tab_control.add(self.tab2, text='Gaussian Noise')                # Add Gaussian tab
         self.tab_control.add(self.tab3, text='Sinusoidal + Gaussian Noise')   # Add Combined tab
         self.tab_control.add(self.tab4, text='Amplitude Table')               # new:
+        self.tab_control.add(self.tab5, text='Import CSV')
         self.tab_control.pack(expand=1, fill="both")                          # Display notebook on window
 
         # Default parameters
@@ -37,8 +39,13 @@ class SignalApp:
         self.sinusoidal = np.zeros(self.n.get())               # Placeholder for sinusoidal signal
         self.gaussiannoise = np.zeros(self.n.get())            # Placeholder for Gaussian noise
         self.seed = tk.IntVar(value=0)                         # Random seed (0 means auto-generate)
+        self.csv_signal_time = None
+        self.csv_signal_amps = None
+        self.csv_noise_time = None
+        self.csv_noise_amps = None
+        self.csv_plot_in_freq = tk.BooleanVar(value=False)  # False = time domain
 
-         # ----- NEW: frequency points for the table tab -----
+        # ----- NEW: frequency points for the table tab -----
         self.freq_points = [
             22, 22.234, 22.5, 23, 23.034, 23.5, 23.834, 24, 24.5, 25,
             25.5, 26, 26.234, 26.5, 27, 27.5, 28, 28.5, 29, 29.5, 30
@@ -55,6 +62,7 @@ class SignalApp:
         self.build_gaussian_tab()      # Create Gaussian Noise tab
         self.build_combined_tab()      # Create Combined tab
         self.build_table_tab()         # Create Frecuancy tab
+        self.build_csv_tab()
 
     # --- Tab 1: Sinusoidal Signal ---
     def build_sine_tab(self):
@@ -315,6 +323,139 @@ class SignalApp:
         self.noisy_ax.grid(True)  # NEW
         self.noisy_canvas.draw()  # NEW
 
+    # --- Tab 5: Import CSV ---
+    def build_csv_tab(self):
+        frame_left = ttk.LabelFrame(self.tab5, text="📁 CSV Import")
+        frame_left.pack(side="left", fill="y", padx=10, pady=10)
+
+        ttk.Button(frame_left, text="Import Signal CSV", command=self.import_signal_csv).pack(pady=6)
+        ttk.Button(frame_left, text="Import Noise CSV", command=self.import_noise_csv).pack(pady=6)
+        ttk.Button(frame_left, text="Toggle Time / Frequency Domain", command=self.toggle_csv_domain).pack(pady=6)
+
+        self.csv_status = ttk.Label(frame_left, text="No file loaded.")
+        self.csv_status.pack(pady=4)
+
+        ttk.Button(frame_left, text="Plot CSV Signal", command=self.plot_csv).pack(pady=10)
+
+        # ---- CSV plot area ----
+        self.csv_fig, self.csv_ax = plt.subplots(figsize=(6, 3))
+        self.csv_canvas = FigureCanvasTkAgg(self.csv_fig, master=self.tab5)
+        self.csv_canvas.get_tk_widget().pack(side="bottom", fill="both", expand=True)
+
+    def import_signal_csv(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("CSV files", "*.csv")]
+        )
+        if not file_path:
+            return
+
+        try:
+            data = np.loadtxt(file_path, delimiter=",", dtype=float, skiprows=1)
+            if data.shape[1] != 2:
+                self.csv_status.config(text="❌ CSV must have 2 columns!")
+                return
+
+            time = data[:, 0]
+            amps = data[:, 1]
+
+            self.csv_signal_time = time
+            self.csv_signal_amps = amps
+
+            self.csv_status.config(text=f"Loaded: {len(time)} rows")
+
+        except Exception as e:
+            self.csv_status.config(text=f"Error: {str(e)}")
+
+    def import_noise_csv(self):
+        file_path = filedialog.askopenfilename(
+            filetypes=[("CSV files", "*.csv")]
+        )
+        if not file_path:
+            return
+
+        try:
+            data = np.loadtxt(file_path, delimiter=",", dtype=float, skiprows=1)
+            if data.shape[1] != 2:
+                self.csv_status.config(text="❌ CSV must have 2 columns!")
+                return
+
+            time = data[:, 0]
+            amps = data[:, 1]
+
+            self.csv_noise_time = time
+            self.csv_noise_amps = amps
+
+            self.csv_status.config(text=f"Loaded: {len(time)} rows")
+
+        except Exception as e:
+            self.csv_status.config(text=f"Error: {str(e)}")
+
+    def plot_csv(self):
+        # Ensure a signal is loaded
+        if not hasattr(self, "csv_signal_time"):
+            self.csv_status.config(text="❌ No signal CSV loaded!")
+            return
+
+        # If no noise is uploaded, use zero noise
+        if not hasattr(self, "csv_noise_time"):
+            noise_time = self.csv_signal_time
+            noise_amps = np.zeros_like(self.csv_signal_amps)
+        else:
+            # Interpolate noise onto the same timeline as the signal
+            noise_time = self.csv_signal_time
+            noise_amps = np.interp(
+                self.csv_signal_time,
+                self.csv_noise_time,
+                self.csv_noise_amps
+            )
+
+        # Compute combined signal = signal + noise
+        total_amps = self.csv_signal_amps + noise_amps
+
+        self.csv_ax.clear()
+
+        if not self.csv_plot_in_freq.get():
+            # --- Time domain ---
+            self.csv_ax.plot(self.csv_signal_time, self.csv_signal_amps, label="Signal", linewidth=1.5)
+            self.csv_ax.plot(noise_time, noise_amps, label="Noise", alpha=0.6)
+            self.csv_ax.plot(self.csv_signal_time, total_amps, label="Signal + Noise", linewidth=2)
+            self.csv_ax.set_xlabel("Time (ns)")
+            self.csv_ax.set_ylabel("Amplitude (Volts)")
+            self.csv_ax.set_title("CSV Signal + Noise (Time Domain)")
+        else:
+            # --- Frequency domain ---
+            N = len(self.csv_signal_time)
+            dt = (self.csv_signal_time[1] - self.csv_signal_time[0]) * 1e-9  # ns -> s
+            freqs = np.fft.fftfreq(N, dt)
+            # FFTs
+            sig_fft = np.fft.fft(self.csv_signal_amps)
+            noise_fft = np.fft.fft(noise_amps)
+            total_fft = np.fft.fft(total_amps)
+            # Only positive frequencies
+            idx = freqs >= 0
+            self.csv_ax.plot(freqs[idx] / 1e9, np.abs(sig_fft[idx]), label="Signal", linewidth=1.5)
+            self.csv_ax.plot(freqs[idx] / 1e9, np.abs(noise_fft[idx]), label="Noise", alpha=0.6)
+            self.csv_ax.plot(freqs[idx] / 1e9, np.abs(total_fft[idx]), label="Signal + Noise", linewidth=2)
+            self.csv_ax.set_xlabel("Frequency (GHz)")
+            self.csv_ax.set_ylabel("Magnitude")
+            self.csv_ax.set_title("CSV Signal + Noise (Frequency Domain)")
+
+        self.csv_ax.grid(True)
+        self.csv_ax.legend()
+        self.csv_canvas.draw()
+        self.csv_status.config(
+            text="CSV plotted in " + ("Frequency Domain" if self.csv_plot_in_freq.get() else "Time Domain"))
+
+    def toggle_csv_domain(self):
+        if not hasattr(self, "csv_signal_time"):
+            self.csv_status.config(text="❌ No signal CSV loaded!")
+            return
+
+        # Toggle state
+        self.csv_plot_in_freq.set(not self.csv_plot_in_freq.get())
+
+        # Replot according to new state
+        self.plot_csv()
 
 
 # --- Main program ---

@@ -44,6 +44,8 @@ class SignalApp:
         self.csv_noise_time = None
         self.csv_noise_amps = None
         self.csv_plot_in_freq = tk.BooleanVar(value=False)  # False = time domain
+        self.cycles = tk.IntVar(value=5)          # cuántos ciclos mostrar
+        self.auto_3T = tk.BooleanVar(value=False) # si True: mostrar 3T siempre
 
         # ----- NEW: frequency points for the table tab -----
         self.freq_points = [
@@ -80,6 +82,12 @@ class SignalApp:
         # Frequency input
         ttk.Label(frame_controls, text="Frequency (Hz):").pack(pady=5)
         tk.Entry(frame_controls, textvariable=self.frequency, width=10).pack()
+
+        # Cycles input 
+        ttk.Label(frame_controls, text="Cycles to display:").pack(pady=5)
+        tk.Spinbox(frame_controls, from_=1, to=1000, textvariable=self.cycles, width=10).pack()
+        ttk.Checkbutton(frame_controls, text="Auto window = 3 periods (3T)",
+                variable=self.auto_3T).pack(pady=5)
 
         # Phase input
         ttk.Label(frame_controls, text="Phase:").pack(pady=5)
@@ -124,6 +132,12 @@ class SignalApp:
         # Number of samples
         ttk.Label(frame_controls, text="Number of samples:").pack(pady=5)
         tk.Spinbox(frame_controls, from_=10, to=10000, textvariable=self.n, width=10).pack()
+
+        # Cycles input 
+        ttk.Label(frame_controls, text="Cycles to display:").pack(pady=5)
+        tk.Spinbox(frame_controls, from_=1, to=1000, textvariable=self.cycles, width=10).pack()
+        ttk.Checkbutton(frame_controls, text="Auto window = 3 periods (3T)",
+                variable=self.auto_3T).pack(pady=5)
 
         # Random seed input
         ttk.Label(frame_controls, text="Seed:").pack(pady=5)

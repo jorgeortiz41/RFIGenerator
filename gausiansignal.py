@@ -100,11 +100,34 @@ class SignalApp:
         self.sine_fig, self.sine_ax = plt.subplots(figsize=(5, 4))                # Create figure and axes
         self.sine_canvas = FigureCanvasTkAgg(self.sine_fig, master=self.tab1)     # Embed figure in tab
         self.sine_canvas.get_tk_widget().pack(side="right", fill="both", expand=True)  # Show plot
+    
+    def update_time_window(self):
+        """
+        Adjust self.duration and self.t based on:
+        - 3 periods (3T) if auto_3T=True
+        - N cycles if auto_3T=False
+        """
+        n = self.n.get()
+        f = float(self.frequency.get())
+
+        if f <= 0:
+        # Avoid dividing by zero or negative frequency
+         self.duration = 1.0
+        else:
+           if self.auto_3T.get():
+            self.duration = 3.0 / f      # 3T
+           else:
+            Ncycles = int(self.cycles.get())
+            self.duration = Ncycles / f  # N cycles
+
+        self.t = np.linspace(0, self.duration, n)
+
+
 
     def plot_sine(self):
         # Get the number of samples and update the time vector
-        n = self.n.get()
-        self.t = np.linspace(0, self.duration, n)
+        self.update_time_window()
+        n = self.n.get()                     # Number of samples
 
         # Get parameters from GUI inputs
         amplitude = self.amplitude.get()
@@ -160,6 +183,8 @@ class SignalApp:
         self.gauss_canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
 
     def plot_gaussian(self):
+        
+        self.update_time_window()
         n = self.n.get()                     # Number of samples
 
         # Retrieve or generate seed
@@ -200,6 +225,8 @@ class SignalApp:
         self.combo_canvas.get_tk_widget().pack(side="right", fill="both", expand=True)
 
     def plot_combined(self):
+        
+        self.update_time_window()
         n = self.n.get()                         # Number of samples
         y = self.sinusoidal                      # Retrieve last generated sinusoidal signal
         noise = self.gaussiannoise               # Retrieve last generated Gaussian noise

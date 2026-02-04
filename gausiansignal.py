@@ -352,7 +352,7 @@ class SignalApp:
         selections = np.array([sv.get() for sv in self.sel_vars], dtype=bool)  # NEW
         noise = np.zeros_like(amps, dtype=float)  # NEW
         if np.any(selections):  # NEW
-            noise[selections] = np.random.normal(mu, sigma, size=selections.sum())  # NEW
+            noise[selections] = np.abs(np.random.normal(mu, sigma, size=selections.sum()))  # NEW
 
         amps_noisy = amps + noise  # NEW
 

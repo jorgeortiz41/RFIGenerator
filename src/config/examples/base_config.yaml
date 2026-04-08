@@ -1,0 +1,122 @@
+project:
+  name: RFIGen
+  version: "0.1.0"
+  profile: base_example
+  description: Base configuration for synthetic K-band radiometric data generation.
+
+run:
+  seed: 12345
+  n_samples: 4096
+  sample_rate_hz: 1000000
+  duration_s: 0.004096
+  output_prefix: run_001
+
+frequency:
+  band:
+    min_ghz: 18.0
+    max_ghz: 27.0
+  center_ghz: 22.235
+  span_mhz: 200.0
+
+# radiometry:
+#   baseline_type: atmospheric_brightness
+#   mean_tb_k: 180.0
+#   variability_tb_k: 4.5
+#   instrument_noise_std_k: 0.35
+#   drift_per_second_k: 0.05
+#   atmosphere:
+#     water_vapor_profile: standard
+#     cloud_liquid_water_mm: 0.10
+#     air_mass_factor: 1.0
+
+rfi_sources:
+  - id: rfi_nb_001
+    type: narrowband
+    enabled: true
+    center_offset_mhz: 12.0
+    bandwidth_mhz: 2.0
+    power_dbm: -72.0
+    persistence: 1.0
+    modulation: none
+
+  - id: rfi_pulse_001
+    type: pulsed
+    enabled: true
+    center_offset_mhz: -25.0
+    bandwidth_mhz: 6.0
+    power_dbm: -65.0
+    duty_cycle: 0.15
+    pulse_period_ms: 8.0
+    persistence: 0.7
+    modulation: none
+
+  - id: rfi_bursty_001
+    type: bursty
+    enabled: false
+    center_offset_mhz: 35.0
+    bandwidth_mhz: 10.0
+    power_dbm: -68.0
+    burst_rate_hz: 25.0
+    burst_duration_ms: 3.0
+    persistence: 0.4
+    modulation: amplitude
+
+composition:
+  inject_rfi: true
+  contamination_target: both
+  amplitude_scaling_mode: linear
+  spectral_overlap_policy: add_power
+  domain_match: frequency
+  snr_db: 18.0
+  normalize_output: true
+
+dataset:
+  dataset_name: kband_synthetic_demo
+  split:
+    train: 0.70
+    validation: 0.15
+    test: 0.15
+  records: 200
+  save_clean: true
+  save_contaminated: true
+  save_metadata: true
+  include_labels: true
+  labels:
+    contaminated_flag: true
+    source_type: true
+    source_count: true
+
+export:
+  directory: outputs/
+  formats:
+    csv: true
+    json_metadata: true
+    mp3000a_style: false
+    npy: true
+  filenames:
+    clean: clean_dataset
+    contaminated: contaminated_dataset
+    metadata: metadata
+  overwrite: false
+
+visualization:
+  enabled: true
+  save_figures: true
+  figure_directory: outputs/figures/
+  products:
+    time_domain: true
+    frequency_spectrum: true
+    spectrogram: true
+
+interfaces:
+  cli:
+    enabled: true
+    allow_parameter_overrides: true
+  gui:
+    enabled: false
+    realtime_preview: false
+
+validation:
+  enforce_k_band_limits: true
+  require_physical_plausibility: true
+  fail_on_invalid_ranges: true

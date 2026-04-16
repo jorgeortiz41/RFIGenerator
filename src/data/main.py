@@ -117,6 +117,11 @@ def cargar_csv_radiometro(ruta):
     )
 
     df = df.dropna()
+    
+    # Keep only columns up to 'Ch  30.000'
+    if 'Ch  30.000' in df.columns:
+        cutoff_idx = df.columns.get_loc('Ch  30.000')
+        df = df.iloc[:, :cutoff_idx + 1]
 
     return df
 

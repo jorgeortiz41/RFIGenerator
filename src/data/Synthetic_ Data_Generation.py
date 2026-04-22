@@ -3,6 +3,14 @@ from __future__ import annotations
 """
 Synthetic Level-1 data generator for a Radiometrics MP-3000A radiometer.
 
+IMPORTANT:
+- This is NOT the real RTTOV model.
+- It generates a "RTTOV-like" approximation of Level-1 brightness temperatures (Tb)
+  by channel, using a simplified atmospheric emission/absorption model inspired by the
+  physics behind microwave radiometry.
+- If you need true RTTOV outputs, you must install RTTOV itself, use the proper
+  coefficient files, and call its interface directly.
+
 What this script creates:
 - A CSV file with Level-1 style data containing:
     record_no, datetime_utc, record_type, channel_mhz, frequency_ghz,
@@ -348,8 +356,7 @@ def write_level1_csv(
     start_time: datetime,
     hours: float,
     step_seconds: int,
-    elevation_deg: float,
-    azimuth_deg: float,
+    scan_positions: list[tuple[float, float]],
     seed: int,
 ) -> None:
     rng = random.Random(seed)
@@ -400,24 +407,25 @@ def write_level1_csv(
             ])
             record_no += 1
 
-            # Brightness temperature records, one per channel.
-            for freq_ghz in ALL_CHANNELS_GHZ:
-                tb_k = synthetic_tb(freq_ghz, state, elevation_deg, rng)
-                writer.writerow([
-                    record_no,
-                    dt_str,
-                    51,
-                    channel_to_mhz(freq_ghz),
-                    f"{freq_ghz:.3f}",
-                    f"{elevation_deg:.2f}",
-                    f"{azimuth_deg:.2f}",
-                    f"{tb_k:.4f}",
-                    round(met.tamb_c, 3),
-                    round(met.rh_pct, 3),
-                    round(met.pressure_hpa, 3),
-                    met.rain_flag,
-                ])
-                record_no += 1
+            # Brightness temperature records for every requested azimuth-elevation direction.
+            for azimuth_deg, elevation_deg in scan_positions:
+                for freq_ghz in ALL_CHANNELS_GHZ:
+                    tb_k = synthetic_tb(freq_ghz, state, elevation_deg, rng)
+                    writer.writerow([
+                        record_no,
+                        dt_str,
+                        51,
+                        channel_to_mhz(freq_ghz),
+                        f"{freq_ghz:.3f}",
+                        f"{elevation_deg:.2f}",
+                        f"{azimuth_deg:.2f}",
+                        f"{tb_k:.4f}",
+                        round(met.tamb_c, 3),
+                        round(met.rh_pct, 3),
+                        round(met.pressure_hpa, 3),
+                        met.rain_flag,
+                    ])
+                    record_no += 1
 
             current += timedelta(seconds=step_seconds)
 
@@ -431,9 +439,11 @@ def write_level1_csv(
 # - output file name
 # - number of hours
 # - time step
-# - elevation and azimuth
 # - random seed
 # - start time
+#
+# The scan directions are now defined inside main() using the
+# 9 requested Az-El directions.
 # ==========================================================
 
 def parse_args() -> argparse.Namespace:
@@ -506,19 +516,36 @@ def main() -> None:
     else:
         start_time = datetime.now(timezone.utc).replace(microsecond=0)
 
+    # Default scan pattern requested by the user.
+    # Format: (azimuth_deg, elevation_deg)
+    scan_positions = [
+        (0.0, 20.0),
+        (0.0, 90.0),
+        (0.0, 160.0),
+        (45.0, 20.0),
+        (45.0, 160.0),
+        (90.0, 20.0),
+        (90.0, 160.0),
+        (135.0, 20.0),
+        (135.0, 160.0),
+    ]
+
     output_path = Path(args.output)
     write_level1_csv(
         output_path=output_path,
         start_time=start_time,
         hours=args.hours,
         step_seconds=args.step_seconds,
-        elevation_deg=args.elevation_deg,
-        azimuth_deg=args.azimuth_deg,
+        scan_positions=scan_positions,
         seed=args.seed,
     )
 
     print(f"File created: {output_path.resolve()}")
     print(f"Simulated channels: {len(ALL_CHANNELS_GHZ)}")
+    print(f"Number of scan directions per time step: {len(scan_positions)}")
+    print("Scan directions (Az-El):")
+    for azimuth_deg, elevation_deg in scan_positions:
+        print(f"  {azimuth_deg:.0f}-{elevation_deg:.0f}")
     print(f"K-band range: {K_BAND_CHANNELS_GHZ[0]:.3f} - {K_BAND_CHANNELS_GHZ[-1]:.3f} GHz")
     print(f"V-band range: {V_BAND_CHANNELS_GHZ[0]:.3f} - {V_BAND_CHANNELS_GHZ[-1]:.3f} GHz")
 

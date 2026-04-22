@@ -13,7 +13,7 @@ import pandas as pd
 # ------------------------------------------------------------
 # 1. Ruta de la carpeta donde están los CSV
 # ------------------------------------------------------------
-CARPETA_DATOS = "datos_radiometro"
+CARPETA_DATOS = "src/data/datos_radiometro"
 
 
 # ------------------------------------------------------------
@@ -116,6 +116,13 @@ def cargar_csv_radiometro(ruta):
         names=header
     )
 
+    df = df.dropna()
+    
+    # Keep only columns up to 'Ch  30.000'
+    if 'Ch  30.000' in df.columns:
+        cutoff_idx = df.columns.get_loc('Ch  30.000')
+        df = df.iloc[:, :cutoff_idx + 1]
+
     return df
 
 
@@ -144,6 +151,7 @@ def main():
 
     try:
         df = cargar_csv_radiometro(ruta_archivo)
+        df.to_csv(f"src/data/datos_radiometro_procesados/{fecha_seleccionada}.csv", index=False)
     except Exception as e:
         print(f"\nError al leer el archivo: {e}")
         return

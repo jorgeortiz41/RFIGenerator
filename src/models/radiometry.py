@@ -123,7 +123,7 @@ class SyntheticRadiometerGenerator:
         # Generate template structure
         data = {
             "Record": list(range(2, n_rows + 2)),
-            "Date/Time": pd.date_range("2023-04-04 00:05:05", periods=n_rows, freq="18S").strftime("%m/%d/%y %H:%M:%S"),
+            "Date/Time": pd.date_range("2023-04-04 00:05:05", periods=n_rows, freq="18s").strftime("%m/%d/%y %H:%M:%S"),
             "50": [50] * n_rows,
             "Az(deg)": np.tile([0.0, 45.0, 90.0, 135.0], n_rows // 4 + 1)[:n_rows],
             "El(deg)": np.tile([19.8, 90.0, 160.2], n_rows // 3 + 1)[:n_rows],
@@ -146,41 +146,6 @@ class SyntheticRadiometerGenerator:
         df = df[cols]
 
         return df
-
-    def save_dataframes(
-        self,
-        dataframes: List[pd.DataFrame],
-        output_dir: str = "src/data/datos_radiometro_sinteticos",
-        prefix: str = "synthetic",
-    ) -> List[str]:
-        """Save generated dataframes to CSV files.
-
-        Parameters
-        ----------
-        dataframes : list of pd.DataFrame
-            Dataframes to save.
-        output_dir : str
-            Output directory path.
-        prefix : str
-            Prefix for output filenames.
-
-        Returns
-        -------
-        list of str
-            Paths to saved files.
-        """
-        from pathlib import Path
-
-        output_path = Path(output_dir)
-        output_path.mkdir(parents=True, exist_ok=True)
-
-        saved_files = []
-        for i, df in enumerate(dataframes):
-            filename = output_path / f"{prefix}_{i:03d}.csv"
-            df.to_csv(filename, index=False)
-            saved_files.append(str(filename))
-
-        return saved_files
 
 
 def generate_synthetic_dataset(
@@ -224,14 +189,6 @@ def generate_synthetic_dataset(
     )
 
     dataframes = generator.generate_dataframes(n_dataframes)
-
-    # Save to disk
-    saved_files = generator.save_dataframes(dataframes, output_dir)
-
-    print(f"✅ Generated {n_dataframes} synthetic dataframes")
-    print(f"   Noise std: {noise_std} K")
-    print(f"   Saved to: {output_dir}")
-    print(f"   Files: {len(saved_files)}")
 
     return dataframes
 

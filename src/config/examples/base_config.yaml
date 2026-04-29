@@ -1,33 +1,27 @@
 project:
   name: RFIGen
   version: "0.1.0"
-  profile: base_example
   description: Base configuration for synthetic K-band radiometric data generation.
 
 run:
   seed: 12345
-  n_samples: 4096
-  sample_rate_hz: 1000000
-  duration_s: 0.004096
-  output_prefix: run_001
+  n_datasets: 5
+  n_records_per_dataset: 1000
 
-frequency:
-  band:
-    min_ghz: 18.0
-    max_ghz: 27.0
-  center_ghz: 22.235
-  span_mhz: 200.0
+radiometry:
+  use_rttov: false
+  base_level1_path: data/profiles/datos_radiometro/2023-04-01_00-04-09_lv1.csv
+  noise_std_k: 0.5
 
-# radiometry:
-#   baseline_type: atmospheric_brightness
-#   mean_tb_k: 180.0
-#   variability_tb_k: 4.5
-#   instrument_noise_std_k: 0.35
-#   drift_per_second_k: 0.05
-#   atmosphere:
-#     water_vapor_profile: standard
-#     cloud_liquid_water_mm: 0.10
-#     air_mass_factor: 1.0
+  # baseline_type: atmospheric_brightness
+  # mean_tb_k: 180.0
+  # variability_tb_k: 4.5
+  # instrument_noise_std_k: 0.35
+  # drift_per_second_k: 0.05
+  # atmosphere:
+  #   water_vapor_profile: standard
+  #   cloud_liquid_water_mm: 0.10
+  #   air_mass_factor: 1.0
 
 rfi_sources:
   - id: rfi_nb_001
@@ -63,50 +57,28 @@ rfi_sources:
 
 composition:
   inject_rfi: true
-  contamination_target: both
-  amplitude_scaling_mode: linear
-  spectral_overlap_policy: add_power
-  domain_match: frequency
-  snr_db: 18.0
-  normalize_output: true
 
-dataset:
-  dataset_name: kband_synthetic_demo
-  split:
-    train: 0.70
-    validation: 0.15
-    test: 0.15
-  records: 200
+export:
   save_clean: true
   save_contaminated: true
   save_metadata: true
-  include_labels: true
-  labels:
-    contaminated_flag: true
-    source_type: true
-    source_count: true
-
-export:
   directory: outputs/
   formats:
     csv: true
-    json_metadata: true
-    mp3000a_style: false
-    npy: true
+    xlsx: false
   filenames:
-    clean: clean_dataset
-    contaminated: contaminated_dataset
-    metadata: metadata
-  overwrite: false
+    clean: clean_kband_demo
+    contaminated: contaminated_kband_demo
+    metadata: metadata_demo
 
-visualization:
-  enabled: true
-  save_figures: true
-  figure_directory: outputs/figures/
-  products:
-    time_domain: true
-    frequency_spectrum: true
-    spectrogram: true
+# visualization:
+#   enabled: true
+#   save_figures: true
+#   figure_directory: outputs/figures/
+#   products:
+#     time_domain: true
+#     frequency_spectrum: true
+#     spectrogram: true
 
 interfaces:
   cli:
@@ -114,9 +86,3 @@ interfaces:
     allow_parameter_overrides: true
   gui:
     enabled: false
-    realtime_preview: false
-
-validation:
-  enforce_k_band_limits: true
-  require_physical_plausibility: true
-  fail_on_invalid_ranges: true

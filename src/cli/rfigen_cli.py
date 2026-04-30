@@ -4,9 +4,11 @@ from src.config.config_loader import load_config
 from src.config.config_parser import parse_and_validate_config, ConfigValidationError
 from src.models.RTTOV_radiometry_gen import main as generate_synthetic_data
 from src.models.radiometry import generate_synthetic_dataset
+from src.models.signal_mixer import generate_rfi_sources, mix_signals
 from src.export.export_data import save_data
 import sys
 import pandas as pd
+import numpy as np
 
 # Direct pipeline execution
 def run_pipeline(config_path):
@@ -37,14 +39,21 @@ def run_pipeline(config_path):
     print(f"Data sample:\n{data[0].head() if isinstance(data, list) and len(data) > 0 else data.head() if isinstance(data, pd.DataFrame) else data}")
 
     # 3. Generate RFI sources
-
+    rng = np.random.default_rng(config.get("run", {}).get("seed", 42))
+    n_sources = config.get("rfi", {}).get("n_sources", 5)
+    source_classes = config.get("rfi", {}).get("source_classes", ["satellite", "aircraft", "ground"])
+    sources = generate_rfi_sources(n_sources, source_classes, rng)
+    print(f"3. Generated {len(sources)} RFI sources successfully!✅")
 
     # 4. Combine radiometric data and RFI sources
-    
+    mixed_data, rfi_infos = mix_signals(data, sources, rng)
+    print("4. RFI signals mixed into radiometric data successfully!✅")
+    print(f"Mixed data sample:\n{mixed_data[0].head() if isinstance(mixed_data, list) and len(mixed_data) > 0 else mixed_data.head() if isinstance(mixed_data, pd.DataFrame) else mixed_data}")
 
     # 5. Export data and metadata
-    # save_data(processed, config.get('output_path'))
-    return config
+    # save_data(mixed_data, config.get('export', {}).get('directory', 'outputs/'))
+    print("5. Data export placeholder (implement save_data)")
+    return mixed_data, rfi_infos
 
 def main():
     if len(sys.argv) < 2:

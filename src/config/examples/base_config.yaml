@@ -13,8 +13,8 @@ run:
 
 frequency:
   band:
-    min_ghz: 18.0
-    max_ghz: 27.0
+    min_ghz: 22.0
+    max_ghz: 30.0
   center_ghz: 22.235
   span_mhz: 200.0
 

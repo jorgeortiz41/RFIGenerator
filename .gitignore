@@ -211,3 +211,14 @@ __marimo__/
 /.idea
 /out
 .vscode
+
+# Generated outputs
+outputs/*
+!outputs/.gitkeep
+!outputs/figures/
+outputs/figures/*
+!outputs/figures/.gitkeep
+
+# Python cache
+__pycache__/
+*.pyc

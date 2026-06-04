@@ -63,7 +63,7 @@ def make_mixer_result() -> MixerResult:
     )
 
     contaminated_df = clean_df.copy()
-    contaminated_df["22.234"] = contaminated_df["22.234"] + 5.0
+    contaminated_df.loc[:, "22.234"] = contaminated_df["22.234"] + 5.0
 
     rfi_matrix = np.zeros((n_samples, 3))
     rfi_matrix[:, 1] = 5.0

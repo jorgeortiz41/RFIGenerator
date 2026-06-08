@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "RFIGenerator"
+version = "0.1.0"
+description = "Synthetic K-band RFI generator for radiometric data"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "matplotlib>=3.7.0",
+    "pyyaml>=6.0",
+    "scipy>=1.11.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4.0", "pytest-cov>=4.1.0"]
+
+[project.scripts]
+rfigen = "src.cli.rfigen_cli:main"
+rfigen-gui = "src.gui.gui_app:launch_gui"
+
+[tool.setuptools]
+packages = ["src", "src.cli", "src.config", "src.data", "src.export", "src.gui", "src.models", "src.tests", "src.utils", "src.visualization", "src.mixer", "src.notebooks"]

@@ -1,0 +1,52 @@
+appnope @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_46iquy4y0r/croot/appnope_1750774774351/work
+asttokens @ file:///Users/ec2-user/croot/asttokens_1773135854395/work
+Bottleneck @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_55txi4fy1u/croot/bottleneck_1731058642212/work
+comm @ file:///opt/miniconda3/conda-bld/comm_1763119153598/work
+contourpy==1.3.3
+cycler==0.12.1
+debugpy @ file:///opt/miniconda3/conda-bld/debugpy_1762421637290/work
+decorator @ file:///opt/miniconda3/conda-bld/decorator_1757341238163/work
+et_xmlfile @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_29xjd2rw2y/croot/et_xmlfile_1756462494507/work
+executing @ file:///opt/miniconda3/conda-bld/executing_1757061235986/work
+fonttools==4.62.1
+iniconfig==2.3.0
+ipykernel @ file:///Users/ec2-user/croot/ipykernel_1772612349714/work
+ipython @ file:///Users/ec2-user/croot/ipython_1773996062377/work
+ipython_pygments_lexers @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_25fteymumy/croot/ipython_pygments_lexers_1744753256449/work
+jedi @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_38ctoinnl0/croot/jedi_1733987402850/work
+jupyter_client @ file:///Users/ec2-user/croot/jupyter_client_1768399009041/work
+jupyter_core @ file:///opt/miniconda3/conda-bld/jupyter_core_1764588283979/work
+kiwisolver==1.5.0
+matplotlib==3.10.8
+matplotlib-inline @ file:///opt/miniconda3/conda-bld/matplotlib-inline_1762779171616/work
+nest_asyncio @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/nest-asyncio_1728588080290/work
+numexpr @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_766kpwgy17/croot/numexpr_1755766476118/work
+numpy @ file:///opt/miniconda3/conda-bld/numpy_and_numpy_base_1760547730050/work/dist/numpy-2.3.3-cp313-cp313-macosx_12_0_arm64.whl#sha256=6528ffc6626f2728a7f27575b39b0f24916f7890c34a559b05c4e64921730c8a
+openpyxl @ file:///Users/builder/cbouss/buildout/croot/openpyxl_1739486465110/work
+packaging==26.0
+pandas @ file:///opt/miniconda3/conda-bld/pandas_1759822251234/work/dist/pandas-2.3.3-cp313-cp313-macosx_12_0_arm64.whl#sha256=132d05e03c5d0b1edf46852a671c634fe3752a9d621f3fbafa5b73c7f22e0e87
+parso @ file:///opt/miniconda3/conda-bld/parso_1762781703500/work
+pexpect @ file:///opt/miniconda3/conda-bld/pexpect_1762535936187/work
+pillow==12.1.1
+platformdirs @ file:///Users/ec2-user/croot/platformdirs_1773652975203/work
+pluggy==1.6.0
+prompt_toolkit @ file:///opt/miniconda3/conda-bld/prompt-toolkit_1761744878191/work
+psutil @ file:///opt/miniconda3/conda-bld/psutil_1761896323233/work
+ptyprocess @ file:///opt/miniconda3/conda-bld/ptyprocess_1762424170819/work/dist/ptyprocess-0.7.0-py2.py3-none-any.whl#sha256=3470be7f810474c8a2ecfcd6e02acc6aea8483ab595417fa4e336362a349933e
+pure_eval @ file:///opt/miniconda3/conda-bld/pure_eval_1757067068750/work
+Pygments @ file:///Users/ec2-user/croot/pygments_1775127038696/work
+pyparsing==3.3.2
+pytest==9.0.3
+python-dateutil @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/python-dateutil_1728585579455/work
+pytz @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_3bjczh6it0/croot/pytz_1752135865541/work
+PyYAML==6.0.3
+pyzmq @ file:///opt/miniconda3/conda-bld/pyzmq_1762375585960/work
+scipy==1.17.1
+setuptools==80.9.0
+six @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_03myqm7p6o/croot/six_1744271511946/work
+stack_data @ file:///opt/miniconda3/conda-bld/stack_data_1757067040463/work
+tornado @ file:///Users/ec2-user/croot/tornado_1774303633236/work
+traitlets @ file:///Users/builder/cbouss/perseverance-python-buildout/croot/traitlets_1728585482264/work
+tzdata @ file:///croot/python-tzdata_1746123641790/work
+wcwidth @ file:///Users/ec2-user/croot/wcwidth_1767780816236/work
+wheel==0.45.1

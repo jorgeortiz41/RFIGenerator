@@ -1,27 +1,32 @@
 [build-system]
-requires = ["setuptools>=68.0", "wheel"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "RFIGenerator"
+name = "rfigen"
 version = "0.1.0"
-description = "Synthetic K-band RFI generator for radiometric data"
+description = "Synthetic radio frequency interference generator for K-band radiometric data"
 readme = "README.md"
 requires-python = ">=3.10"
+authors = [
+  { name = "RFIGen Project" }
+]
 dependencies = [
-    "numpy>=1.24.0",
-    "pandas>=2.0.0",
-    "matplotlib>=3.7.0",
-    "pyyaml>=6.0",
-    "scipy>=1.11.0",
+  "numpy>=1.23",
+  "matplotlib>=3.6"
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.4.0", "pytest-cov>=4.1.0"]
+dev = ["pytest>=7.0"]
+yaml = ["PyYAML>=6.0"]
+scipy = ["scipy>=1.9"]
 
 [project.scripts]
-rfigen = "src.cli.rfigen_cli:main"
-rfigen-gui = "src.gui.gui_app:launch_gui"
+rfigen = "rfigen.cli:main"
 
-[tool.setuptools]
-packages = ["src", "src.cli", "src.config", "src.data", "src.export", "src.gui", "src.models", "src.tests", "src.utils", "src.visualization", "src.mixer", "src.notebooks"]
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

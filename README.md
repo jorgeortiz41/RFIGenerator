@@ -1,87 +1,97 @@
-# RFI Generator: Synthetic K-band Radio Frequency Interference Generator
+# RFIGen
 
-A comprehensive Python application for generating synthetic RFI signals in the K-band for radiometric data analysis. This tool enables researchers to generate realistic RFI-contaminated datasets for developing RFI detection and mitigation algorithms.
+RFIGen is a Python application for creating synthetic Radio Frequency Interference (RFI)
+in K-band ground-based radiometric observations, with the default working band set to
+20-30 GHz. It includes:
 
-## Features
+- configurable RFI signal models
+- MP-3000A-like clean radiometric simulation
+- clean/contaminated dataset generation
+- CSV, NPZ, JSON metadata, and figure export
+- per-direction radiometric profile figures
+- CLI automation
+- Tkinter GUI for interactive exploration
 
-- **Interactive generation** of synthetic RFI-contaminated radiometric data
-- **Multiple RFI source types**: satellite, aircraft, ground, narrowband, pulsed, bursty
-- **CLI and GUI interfaces** for flexibility
-- **Real-time visualization** in time, frequency, and time-frequency domains
-- **Batch processing** for large-scale dataset generation
-- **Configurable parameters** via YAML files
-- **Reproducible results** with seed-based random number generation
+## Environment
+
+Use the requested Conda environment:
+
+```bash
+source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh
+conda activate RFI_Generator
+```
+
+You can run the project directly from the repository. Editable installation is optional.
+In a restricted environment, `--no-build-isolation` avoids downloading build tooling:
+
+```bash
+pip install -e ".[dev,yaml,scipy]" --no-build-isolation
+```
+
+If YAML or SciPy are not installed, RFIGen still works with JSON configs and NumPy-based
+fallbacks.
 
 ## Quick Start
 
-### CLI Usage
+Generate a dataset:
 
 ```bash
-conda activate RFI_Generator
-PYTHONPATH=$(pwd):$PYTHONPATH python3 -m src.cli --config src/config/examples/base_config.yaml
+python rfigen_cli.py generate --config configs/example.yaml --output outputs/example
 ```
 
-### GUI Usage
+Create plots from the same configuration:
 
 ```bash
-conda activate RFI_Generator
-python3 -c "from src.gui.gui_app import launch_gui; launch_gui()"
+python rfigen_cli.py plot --config configs/example.yaml --output outputs/figures
 ```
 
-## Requirements
-
-- Python 3.10+
-- numpy, pandas, matplotlib, scipy, pyyaml
-
-## Installation
+Open the GUI:
 
 ```bash
-conda create -n RFI_Generator python=3.13
-conda activate RFI_Generator
-conda install numpy pandas matplotlib scipy pyyaml pytest
-pip install -e .
+python Gui_app.py
 ```
 
-## Project Structure
-
-```
-src/
-├── cli/                    # Command-line interface
-├── gui/                    # Graphical user interface
-├── models/                 # RFI and radiometry models
-├── visualization/          # Plotting utilities
-├── config/                 # Configuration management
-├── export/                 # Data export
-└── tests/                  # Unit tests (30 passing)
-```
-
-## Testing
+Inspect a processed radiometer profile CSV:
 
 ```bash
-pytest src/tests/ -v
+python rfigen_cli.py inspect-csv /path/to/2023-04-01.csv
 ```
 
-## Documentation
+Inject RFI into a real profile dataset:
 
-See README in the project for complete documentation including:
-- Detailed installation instructions
-- Configuration file format
-- Usage examples
-- API documentation
-- RFI source type specifications
+```bash
+python rfigen_cli.py generate-from-csv /path/to/2023-04-01.csv --rfi-type narrowband --center-frequency-ghz 28.0 --power-k 35 --output outputs/real_profile
+```
 
-## Status
+Run tests:
 
-✅ All 30 unit tests passing
-✅ CLI fully functional
-✅ GUI fully implemented
-✅ Visualization components complete
-✅ Ready for deployment
+```bash
+pytest
+```
 
-## License
+## Data Model
 
-MIT License
+Datasets are represented as time-by-frequency arrays in Kelvin:
 
-## Contact
+- `clean`: synthetic radiometric brightness temperature
+- `rfi`: additive interference field
+- `contaminated`: clean + RFI
 
-ECE Department, University of Puerto Rico - Mayagüez
+Frequencies are stored in GHz. The base example uses the processed radiometer profile
+channels from 22.000-30.000 GHz, including nonuniform channels such as 22.234, 23.034,
+and 26.234 GHz. The CSV importer defaults to the broader 20-30 GHz selection.
+
+The main profile figure is `figures/profiles_by_direction.png`. Individual direction
+profiles and direction-specific time-frequency views are written under `figures/directions/`.
+
+## Supported RFI Models
+
+- `narrowband`
+- `broadband`
+- `pulsed`
+- `bursty`
+- `chirp`
+- `am`
+
+Each model supports configurable center frequency, bandwidth, power, persistence, duty
+cycle, and optional modulation parameters.

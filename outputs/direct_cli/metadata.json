@@ -1,0 +1,36 @@
+{
+  "created_utc": "2026-06-09T12:45:37.748652+00:00",
+  "seed": 1234,
+  "duration_s": 3.0,
+  "sample_rate_hz": 2.0,
+  "frequency_start_ghz": 18.0,
+  "frequency_stop_ghz": 27.0,
+  "frequency_bins": 256,
+  "radiometry": {
+    "baseline_k": 285.0,
+    "atmospheric_variation_k": 3.0,
+    "receiver_noise_k": 0.5,
+    "spectral_slope_k": 2.0
+  },
+  "rfi": [
+    {
+      "type": "am",
+      "center_frequency_ghz": 22.235,
+      "start_frequency_ghz": null,
+      "stop_frequency_ghz": null,
+      "bandwidth_mhz": 25.0,
+      "power_k": 15.0,
+      "duty_cycle": 0.5,
+      "pulse_period_s": 1.0,
+      "persistence": 1.0,
+      "modulation_frequency_hz": 0.2,
+      "modulation_depth": 0.5,
+      "phase_rad": 0.0,
+      "seed": null
+    }
+  ],
+  "shape": {
+    "time": 6,
+    "frequency": 256
+  }
+}

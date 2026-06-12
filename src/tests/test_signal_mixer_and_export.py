@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.export.export_data import save_data, save_file
+from src.export.export_data import save_data, save_file, save_pipeline_outputs
 from src.models.signal_mixer import (
     add_rfi_to_dataframe,
     generate_rfi_sources,
@@ -107,3 +107,47 @@ def test_save_file_copies_to_requested_path(tmp_path):
 
     assert saved_path == output_path
     assert output_path.read_text(encoding="utf-8") == "content"
+
+
+def test_save_pipeline_outputs_writes_clean_contaminated_and_metadata(tmp_path):
+    clean_data = [sample_dataframe(), sample_dataframe()]
+    contaminated_data = [
+        sample_dataframe().assign(**{"Ch 22.000": [101.0, 101.0, 101.0]}),
+        sample_dataframe().assign(**{"Ch 22.000": [102.0, 102.0, 102.0]}),
+    ]
+    config = {
+        "project": {"name": "RFIGen"},
+        "run": {"seed": 123},
+        "export": {
+            "save_clean": True,
+            "save_contaminated": True,
+            "save_metadata": True,
+            "directory": str(tmp_path),
+            "formats": {"csv": True, "xlsx": False},
+            "filenames": {
+                "clean": "clean_demo",
+                "contaminated": "contaminated_demo",
+                "metadata": "metadata_demo",
+            },
+        },
+    }
+
+    saved = save_pipeline_outputs(
+        clean_data=clean_data,
+        contaminated_data=contaminated_data,
+        rfi_infos=[[{"avg_coupling": np.float64(1.0)}], [{"avg_coupling": np.float64(0.5)}]],
+        sources=[sample_source()],
+        config=config,
+    )
+
+    assert len(saved["clean"]) == 2
+    assert len(saved["contaminated"]) == 2
+    assert (tmp_path / "clean_demo_000.csv").exists()
+    assert (tmp_path / "clean_demo_001.csv").exists()
+    assert (tmp_path / "contaminated_demo_000.csv").exists()
+    assert (tmp_path / "contaminated_demo_001.csv").exists()
+
+    metadata = json.loads((tmp_path / "metadata_demo.json").read_text(encoding="utf-8"))
+    assert metadata["dataset_count"] == 2
+    assert metadata["rfi_source_count"] == 1
+    assert metadata["rfi_infos"][0][0]["avg_coupling"] == 1.0

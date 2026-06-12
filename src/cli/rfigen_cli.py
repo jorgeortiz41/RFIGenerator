@@ -5,7 +5,7 @@ from src.config.config_parser import parse_and_validate_config, ConfigValidation
 from src.models.RTTOV_radiometry_gen import main as generate_synthetic_data
 from src.models.radiometry import generate_synthetic_dataset
 from src.models.signal_mixer import generate_rfi_sources, mix_signals
-from src.export.export_data import save_data
+from src.export.export_data import save_pipeline_outputs
 import sys
 import pandas as pd
 import numpy as np
@@ -50,9 +50,16 @@ def run_pipeline(config_path):
     print("4. RFI signals mixed into radiometric data successfully!✅")
     print(f"Mixed data sample:\n{mixed_data[0].head() if isinstance(mixed_data, list) and len(mixed_data) > 0 else mixed_data.head() if isinstance(mixed_data, pd.DataFrame) else mixed_data}")
 
-    # 5. Export data and metadata
-    # save_data(mixed_data, config.get('export', {}).get('directory', 'outputs/'))
-    print("5. Data export placeholder (implement save_data)")
+    # 5. Export clean data, contaminated data, and metadata
+    saved_files = save_pipeline_outputs(
+        clean_data=data,
+        contaminated_data=mixed_data,
+        rfi_infos=rfi_infos,
+        sources=sources,
+        config=config,
+    )
+    print("5. Data and metadata exported successfully!✅")
+    print(f"Export summary: {saved_files}")
     return mixed_data, rfi_infos
 
 def main():

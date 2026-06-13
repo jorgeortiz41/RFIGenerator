@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rfigen"
+version = "0.1.0"
+description = "Synthetic radio frequency interference generator for K-band radiometric data"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "RFIGen Project" }
+]
+dependencies = [
+  "numpy>=1.23",
+  "matplotlib>=3.6"
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+yaml = ["PyYAML>=6.0"]
+scipy = ["scipy>=1.9"]
+
+[project.scripts]
+rfigen = "rfigen.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

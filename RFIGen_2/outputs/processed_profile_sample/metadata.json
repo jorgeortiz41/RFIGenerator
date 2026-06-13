@@ -1,0 +1,75 @@
+{
+  "source_file": "/Users/jorgeandres/Code/PYTHON/RFIGenerator/src/data/datos_radiometro_procesados/2023-04-01.csv",
+  "source_format": "MP-3000A-style level-1 CSV",
+  "rows": 2858,
+  "frequency_channels_ghz": [
+    22.0,
+    22.234,
+    22.5,
+    23.0,
+    23.034,
+    23.5,
+    23.834,
+    24.0,
+    24.5,
+    25.0,
+    25.5,
+    26.0,
+    26.234,
+    26.5,
+    27.0,
+    27.5,
+    28.0,
+    28.5,
+    29.0,
+    29.5,
+    30.0
+  ],
+  "frequency_range_ghz": [
+    22.0,
+    30.0
+  ],
+  "directions": [
+    {
+      "azimuth_deg": 0.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 0.0,
+      "elevation_deg": 90.0
+    },
+    {
+      "azimuth_deg": 0.0,
+      "elevation_deg": 160.2
+    },
+    {
+      "azimuth_deg": 45.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 45.0,
+      "elevation_deg": 160.2
+    },
+    {
+      "azimuth_deg": 90.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 90.0,
+      "elevation_deg": 160.2
+    },
+    {
+      "azimuth_deg": 135.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 135.0,
+      "elevation_deg": 160.2
+    }
+  ],
+  "rfi": [],
+  "seed": 1234,
+  "data_quality_values": [
+    0
+  ]
+}

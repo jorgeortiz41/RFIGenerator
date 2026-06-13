@@ -1,0 +1,86 @@
+{
+  "created_utc": "2026-06-09T13:51:06.458399+00:00",
+  "seed": 2026,
+  "duration_s": 60,
+  "sample_rate_hz": 1,
+  "frequency_start_ghz": 22.0,
+  "frequency_stop_ghz": 30.0,
+  "frequency_bins": 21,
+  "frequency_channels_ghz": [
+    22.0,
+    22.234,
+    22.5,
+    23.0,
+    23.034,
+    23.5,
+    23.834,
+    24.0,
+    24.5,
+    25.0,
+    25.5,
+    26.0,
+    26.234,
+    26.5,
+    27.0,
+    27.5,
+    28.0,
+    28.5,
+    29.0,
+    29.5,
+    30.0
+  ],
+  "radiometry": {
+    "baseline_k": 95.0,
+    "atmospheric_variation_k": 2.0,
+    "receiver_noise_k": 0.65,
+    "spectral_slope_k": -38.0,
+    "zenith_scale": 0.42,
+    "high_elevation_scale": 1.08,
+    "profile_bump_k": 9.0,
+    "spike_probability": 0.0,
+    "spike_power_k": 35.0
+  },
+  "scan_directions": [
+    {
+      "azimuth_deg": 0.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 0.0,
+      "elevation_deg": 90.0
+    },
+    {
+      "azimuth_deg": 0.0,
+      "elevation_deg": 160.2
+    },
+    {
+      "azimuth_deg": 45.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 45.0,
+      "elevation_deg": 160.2
+    },
+    {
+      "azimuth_deg": 90.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 90.0,
+      "elevation_deg": 160.2
+    },
+    {
+      "azimuth_deg": 135.0,
+      "elevation_deg": 19.8
+    },
+    {
+      "azimuth_deg": 135.0,
+      "elevation_deg": 160.2
+    }
+  ],
+  "rfi": [],
+  "shape": {
+    "time": 60,
+    "frequency": 21
+  }
+}

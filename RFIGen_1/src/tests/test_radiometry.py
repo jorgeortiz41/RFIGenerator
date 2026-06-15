@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from src.models.radiometry import SyntheticRadiometerGenerator, generate_synthetic_dataset
+from RFIGen_1.src.models.radiometry import SyntheticRadiometerGenerator, generate_synthetic_dataset
 
 
 def test_create_default_template_has_expected_rows_and_channels():

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.models.rfi_generator import (
+from RFIGen_1.src.models.rfi_generator import (
     add_rfi,
     angular_coupling,
     frequency_shape,

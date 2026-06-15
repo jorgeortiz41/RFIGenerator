@@ -13,9 +13,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from src.config.config_loader import load_config, save_config
-from src.models.radiometry import generate_synthetic_dataset
-from src.models.signal_mixer import generate_rfi_sources, mix_signals
+from RFIGen_1.src.config.config_loader import load_config, save_config
+from RFIGen_1.src.models.radiometry import generate_synthetic_dataset
+from RFIGen_1.src.models.signal_mixer import generate_rfi_sources, mix_signals
 
 
 class RFIGeneratorGUI:

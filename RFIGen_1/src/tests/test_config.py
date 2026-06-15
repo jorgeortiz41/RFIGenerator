@@ -2,8 +2,8 @@ import json
 
 import pytest
 
-from src.config.config_loader import ConfigLoadError, load_config, save_config
-from src.config.config_parser import ConfigValidationError, parse_and_validate_config
+from RFIGen_1.src.config.config_loader import ConfigLoadError, load_config, save_config
+from RFIGen_1.src.config.config_parser import ConfigValidationError, parse_and_validate_config
 
 
 def test_parse_and_validate_config_applies_defaults():

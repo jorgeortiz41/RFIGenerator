@@ -4,8 +4,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.export.export_data import save_data, save_file, save_pipeline_outputs
-from src.models.signal_mixer import (
+from RFIGen_1.src.export.export_data import save_data, save_file, save_pipeline_outputs
+from RFIGen_1.src.models.signal_mixer import (
     add_rfi_to_dataframe,
     generate_rfi_sources,
     mix_signals,

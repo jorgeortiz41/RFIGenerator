@@ -1,11 +1,11 @@
 # Minimal imports
 from pathlib import Path
-from src.config.config_loader import load_config
-from src.config.config_parser import parse_and_validate_config, ConfigValidationError
-from src.models.RTTOV_radiometry_gen import main as generate_synthetic_data
-from src.models.radiometry import generate_synthetic_dataset
-from src.models.signal_mixer import generate_rfi_sources, mix_signals
-from src.export.export_data import save_pipeline_outputs
+from RFIGen_1.src.config.config_loader import load_config
+from RFIGen_1.src.config.config_parser import parse_and_validate_config, ConfigValidationError
+from RFIGen_1.src.models.RTTOV_radiometry_gen import main as generate_synthetic_data
+from RFIGen_1.src.models.radiometry import generate_synthetic_dataset
+from RFIGen_1.src.models.signal_mixer import generate_rfi_sources, mix_signals
+from RFIGen_1.src.export.export_data import save_pipeline_outputs
 import sys
 import pandas as pd
 import numpy as np

@@ -1,0 +1,84 @@
+seed: 2026
+duration_s: 60
+sample_rate_hz: 1
+frequency_start_ghz: 22.0
+frequency_stop_ghz: 30.0
+frequency_bins: 21
+frequency_channels_ghz:
+  - 22.000
+  - 22.234
+  - 22.500
+  - 23.000
+  - 23.034
+  - 23.500
+  - 23.834
+  - 24.000
+  - 24.500
+  - 25.000
+  - 25.500
+  - 26.000
+  - 26.234
+  - 26.500
+  - 27.000
+  - 27.500
+  - 28.000
+  - 28.500
+  - 29.000
+  - 29.500
+  - 30.000
+
+scan_directions:
+  - azimuth_deg: 0.0
+    elevation_deg: 19.8
+  - azimuth_deg: 0.0
+    elevation_deg: 90.0
+  - azimuth_deg: 0.0
+    elevation_deg: 160.2
+  - azimuth_deg: 45.0
+    elevation_deg: 19.8
+  - azimuth_deg: 45.0
+    elevation_deg: 160.2
+  - azimuth_deg: 90.0
+    elevation_deg: 19.8
+  - azimuth_deg: 90.0
+    elevation_deg: 160.2
+  - azimuth_deg: 135.0
+    elevation_deg: 19.8
+  - azimuth_deg: 135.0
+    elevation_deg: 160.2
+
+radiometry:
+  baseline_k: 95.0
+  atmospheric_variation_k: 2.0
+  receiver_noise_k: 0.65
+  spectral_slope_k: -38.0
+  zenith_scale: 0.42
+  high_elevation_scale: 1.08
+  profile_bump_k: 9.0
+  spike_probability: 0.0
+  spike_power_k: 35.0
+
+# Keep the base example clean. Add RFI entries here or use CLI flags to simulate spikes.
+rfi: []
+
+# Example RFI configuration:
+# Uncomment this block and remove/comment `rfi: []` above to inject synthetic RFI.
+#
+# rfi:
+#   - type: narrowband
+#     center_frequency_ghz: 28.0
+#     bandwidth_mhz: 80
+#     power_k: 35
+#     persistence: 0.35
+#   - type: pulsed
+#     center_frequency_ghz: 24.0
+#     bandwidth_mhz: 120
+#     power_k: 25
+#     duty_cycle: 0.15
+#     pulse_period_s: 6.0
+#     persistence: 0.8
+
+export:
+  include_csv: true
+  include_npz: true
+  include_plots: true

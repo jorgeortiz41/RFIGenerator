@@ -211,3 +211,5 @@ __marimo__/
 /.idea
 /out
 .vscode
+# Generated datasets, figures and exports
+outputs/

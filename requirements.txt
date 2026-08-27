@@ -1,0 +1,14 @@
+# Runtime dependencies for RFIGen.
+# Install with:  pip install -r requirements.txt
+# or install the package itself:  pip install -e ".[dev]"
+
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+pyyaml>=6.0
+scipy>=1.11
+openpyxl>=3.1
+
+# Development / testing
+pytest>=7.4
+pytest-cov>=4.1

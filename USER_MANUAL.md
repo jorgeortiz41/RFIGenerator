@@ -19,7 +19,7 @@
 
 ## 1.1 CLI Overview & Architecture
 
-The RFIGen_2 Command-Line Interface provides a Unix-style tool for scriptable, reproducible RFI dataset generation and analysis. The CLI uses subcommands to organize functionality:
+The RFIGen Command-Line Interface provides a Unix-style tool for scriptable, reproducible RFI dataset generation and analysis. The CLI uses subcommands to organize functionality:
 
 ```
 rfigen [OPTIONS] COMMAND [COMMAND_OPTIONS]
@@ -33,7 +33,9 @@ rfigen [OPTIONS] COMMAND [COMMAND_OPTIONS]
 | `plot` | Generate publication-quality visualizations from configuration |
 | `inspect-csv` | Analyze MP-3000A radiometer CSV files |
 | `generate-from-csv` | Inject synthetic RFI into real radiometer CSV data |
-| `gui` | Launch interactive graphical interface |
+| `gui` | Launch an interactive graphical interface (`--legacy`, `--mp3000a`, `--signal`) |
+| `pipeline` | Run the legacy config-driven pipeline (source classes, angular coupling) |
+| `rttov` | Generate a synthetic MP-3000A Level-1 CSV with the RTTOV model |
 
 ### Common Options (Available for `generate`, `plot`, `generate-from-csv`)
 
@@ -302,6 +304,48 @@ No additional options. Opens the RFIGen_2 GUI window for interactive parameter a
 
 ---
 
+### `rfigen pipeline`
+
+Runs the legacy DataFrame engine end to end: clean radiometry, RFI source sampling with
+azimuth/elevation angular coupling, mixing, and export of the clean/contaminated pair plus
+metadata.
+
+```bash
+rfigen pipeline --config configs/legacy_base.yaml
+```
+
+| Option | Purpose |
+|--------|---------|
+| `--config FILE` | Required. YAML or JSON legacy configuration file |
+
+Output location and file names come from the config's `export` block, not from a flag.
+Setting `radiometry.use_rttov: true` makes the pipeline generate its clean data with the
+RTTOV model instead of the template generator, reshaping the result automatically.
+
+### `rfigen rttov`
+
+Generates a synthetic MP-3000A Level-1 CSV directly.
+
+```bash
+rfigen rttov --output outputs/rttov_lv1.csv --hours 6 --step-seconds 60 --seed 42
+```
+
+| Option | Default | Purpose |
+|--------|---------|---------|
+| `--output PATH` | `outputs/rttov_lv1.csv` | Output CSV path |
+| `--hours H` | `6.0` | Hours to simulate |
+| `--step-seconds S` | `60` | Seconds between samples |
+| `--seed N` | `42` | Random seed |
+| `--start-utc T` | now | UTC start as `YYYY-mm-ddTHH:MM:SS` |
+
+It simulates 8 K-band and 14 V-band channels across 9 azimuth/elevation scan directions,
+writing tidy/long rows (one row per channel per observation, record type 51). This is a
+**different schema** from the MP-3000A wide format that `inspect-csv` and
+`generate-from-csv` read, so those commands cannot consume this file directly; use
+`use_rttov: true` in a legacy config to feed it into the pipeline instead.
+
+---
+
 ## 1.3 CLI Workflows
 
 ### Workflow 1: Basic Synthetic Dataset Generation
@@ -405,7 +449,7 @@ done
 
 # Part 2: GUI Guide
 
-## 2.1 RFIGen_2 GUI (Primary)
+## 2.1 Core GUI (Primary)
 
 The RFIGen_2 GUI provides an interactive interface for real-time parameter adjustment and visualization.
 
@@ -553,13 +597,13 @@ Message displays: "Dataset exported to /path/to/output"
 
 ---
 
-## 2.2 Original GUI (Legacy)
+## 2.2 MP-3000A GUI (Legacy Engine)
 
-Located in `/` root directory as `gui_visual.py`.
+Installed as `rfigen-gui-mp3000a` (module `rfigen.legacy.mp3000a_gui`).
 
-### Key Differences from RFIGen_2
+### Key Differences from the Core GUI
 
-| Feature | RFIGen_2 | Original |
+| Feature | Core GUI | MP-3000A GUI |
 |---------|----------|----------|
 | Architecture | Modern modular | Monolithic |
 | RFI Types | 6 parametric (narrowband, etc.) | 5 source classes (5G, Radar, etc.) |
@@ -569,15 +613,15 @@ Located in `/` root directory as `gui_visual.py`.
 | Configuration | YAML/JSON files | GUI-only |
 | CLI Support | Full | Limited |
 
-### When to Use Original GUI
+### When to Use the MP-3000A GUI
 
 - Working with Excel (`*.xlsx`) radiometer files
 - Using RFI source class models (5G, Radar Systems, etc.)
 - Legacy experiment compatibility
 
-### Original GUI RFI Source Classes
+### MP-3000A GUI RFI Source Classes
 
-Located in `/gui_visual.py`:
+Defined in `src/rfigen/legacy/mp3000a_gui.py`:
 
 - **5G**: Typical 5G signal characteristics
 - **Radar Systems**: Pulsed radar patterns
@@ -585,15 +629,55 @@ Located in `/gui_visual.py`:
 - **ISM Equipment**: Industrial/Scientific/Medical equipment
 - **Unintentional Emitters**: Equipment leakage and unintended radiation
 
-### Launching Original GUI
+### Launching the MP-3000A GUI
 
 ```bash
-python gui_visual.py
+rfigen-gui-mp3000a
 ```
 
 Requires pandas and openpyxl:
 ```bash
 pip install pandas openpyxl
+```
+
+---
+
+## 2.3 Legacy Config GUI
+
+Installed as `rfigen-gui-legacy` (module `rfigen.legacy.gui`), also reachable as
+`rfigen gui --legacy`.
+
+Drives the legacy DataFrame engine from a YAML/JSON config. On launch it loads
+`configs/legacy_base.yaml` if it can find it, otherwise it starts unconfigured.
+
+- **File menu**: Load Configuration, Save Configuration
+- **Radiometry controls**: dataset count, records per dataset, noise standard deviation, seed
+- **RFI controls**: number of sources and the source classes to sample from
+- **Actions**: Generate (runs on a worker thread), Export
+- **Plots**: time domain, frequency domain, and spectrogram tabs comparing clean vs contaminated
+
+```bash
+rfigen-gui-legacy
+```
+
+---
+
+## 2.4 Signal Workbench GUI
+
+Installed as `rfigen-gui-signal` (module `rfigen.legacy.signal_gui`), also reachable as
+`rfigen gui --signal`.
+
+A standalone exploration tool for the underlying signal primitives, independent of the
+radiometry pipeline. Five tabs:
+
+- **Sine**: amplitude, frequency, phase, cycle count, and unit selection
+- **Gaussian**: noise with configurable mean and standard deviation
+- **Combined**: sine plus Gaussian noise
+- **Table**: per-frequency amplitude table with a global amplitude scale, plotted as spectra
+- **CSV**: import a signal file and a noise file, plot either in the time or frequency domain
+
+```bash
+rfigen-gui-signal
 ```
 
 ---
@@ -2620,7 +2704,7 @@ python rfigen_cli.py --help
 
 Or use full path:
 ```bash
-python /path/to/RFIGenerator/RFIGen_2/rfigen_cli.py --help
+python /path/to/RFIGenerator/rfigen_cli.py --help
 ```
 
 ---
@@ -2969,7 +3053,7 @@ scipy.io.savemat('output.mat', data)  # To MATLAB
 
 1. **Verify installation**:
    ```bash
-   python RFIGen_2/rfigen_cli.py --help
+   python rfigen_cli.py --help
    ```
 
 2. **Try minimal example**:

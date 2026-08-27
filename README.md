@@ -52,13 +52,13 @@ The tool emphasizes **reproducibility** through seed-based random number generat
 ## Key Features
 
 ### Interfaces
-- **CLI**: Full command-line interface with 5 subcommands for scripting and automation
-- **GUI**: Interactive graphical interface for real-time parameter adjustment and visualization
-- Both interfaces available in the modern RFIGen_2 version
+- **CLI**: One `rfigen` command with 7 subcommands for scripting and automation
+- **GUI**: Four interactive graphical interfaces, each with its own entry point
+- Both engines — the ndarray core and the legacy DataFrame pipeline — are reachable from the same CLI
 
 ### RFI Models
-- **6 Parametric Waveform Models** (RFIGen_2): narrowband, broadband, pulsed, bursty, chirp, AM
-- **5 RFI Source Classes** (Original): 5G, Radar Systems, Broadcast Services, ISM Equipment, Unintentional Emitters
+- **6 Parametric Waveform Models** (core engine): narrowband, broadband, pulsed, bursty, chirp, AM
+- **5 RFI Source Classes** (legacy engine): 5G, Radar Systems, Broadcast Services, ISM Equipment, Unintentional Emitters
 - Mix multiple RFI sources in a single experiment
 
 ### Data Support
@@ -86,47 +86,43 @@ The tool emphasizes **reproducibility** through seed-based random number generat
 - **Real Data Integration**: Combine synthetic RFI with actual radiometer measurements
 - **Flexible Frequency Bands**: Custom frequency grids or standard K-band profiles
 
-## Project Versions
+## Architecture
 
-RFIGenerator includes two main versions, each with distinct strengths:
+RFIGen ships a single installable package (`rfigen`) containing two engines. They were
+previously two separate projects (`RFIGen_1` and `RFIGen_2`) and have been merged without
+rewriting either one, so both keep their exact numerical behavior.
 
-### RFIGen_2 (Recommended for new projects)
-**Location**: `/RFIGen_2/` directory
+### Core engine — `rfigen.*`
 
-**Features**:
-- Modern, modular Python codebase
-- Complete CLI with 5 subcommands (`generate`, `plot`, `inspect-csv`, `generate-from-csv`, `gui`)
-- Clean Tkinter GUI with real-time visualization
-- 6 parametric RFI waveform models
-- YAML/JSON configuration file support
-- Better organized source structure (`src/rfigen/`)
-- Python API for programmatic use
+Models a scan as a **time x frequency ndarray** of brightness temperatures in Kelvin, with
+dataclass-based configuration.
 
-**Best for**: 
-- New experiments and algorithm development
-- Scripting and batch processing
-- Clean synthetic dataset generation
-- Real data injection workflows
+- 6 parametric RFI waveform models: `narrowband`, `broadband`, `pulsed`, `bursty`, `chirp`, `am`
+- MP-3000A-like clean radiometric simulation and real MP-3000A Level-1 CSV import
+- CSV, NPZ, JSON metadata and figure export, including per-direction profiles
+- Best for new experiments, batch processing, and real-data injection workflows
 
-**Limitations**:
-- Requires PyYAML for config file loading (but works with CLI flags without it)
+### Legacy engine — `rfigen.legacy.*`
 
-### Original Version (GUI for real data analysis)
-**Location**: Root directory (`gui_visual.py` and `src/` subdirectories)
+Models a scan as **MP-3000A-style pandas rows** (`Ch <freq>` columns), with dict-based YAML
+configuration and a deep-merge validator.
 
-**Features**:
-- Comprehensive GUI optimized for real radiometer data analysis
-- 5 RFI source classes (5G, Radar, Broadcast, ISM, Unintentional)
-- Direct XLSX/CSV file import with data cleaning
-- Synthetic RFI overlay on real measurements
-- Detailed radiometer profile visualizations
+- RFI **source classes** (5G, Radar, Broadcast, ISM, Unintentional) with azimuth/elevation
+  angular coupling — a pointing-aware model the core engine does not have
+- RTTOV-style synthetic Level-1 generator
+- CSV/XLSX export
+- Best for pointing-dependent studies, Excel workflows, and legacy experiment compatibility
 
-**Best for**:
-- Analyzing existing MP-3000A measurements
-- Working with Excel-based radiometer data
-- RFI source class-based analysis
+### Graphical interfaces
 
-**Integration**: Both versions share underlying radiometry and visualization principles; original provides RFI source class models not present in RFIGen_2.
+All four GUIs are preserved and installed as console scripts:
+
+| Command | Also | What it is |
+|---------|------|------------|
+| `rfigen-gui` | `rfigen gui` | Core engine: live parametric RFI controls, direction picker, export |
+| `rfigen-gui-mp3000a` | `rfigen gui --mp3000a` | Real MP-3000A workflow: XLSX/CSV cleaning, direction and frequency filtering, 5 RFI source classes, 300-DPI figure export |
+| `rfigen-gui-legacy` | `rfigen gui --legacy` | Legacy engine: config load/save, generate, time/frequency/spectrogram tabs, export |
+| `rfigen-gui-signal` | `rfigen gui --signal` | Signal workbench: sine, Gaussian noise, combined, frequency table, CSV import |
 
 ## Installation
 
@@ -147,9 +143,8 @@ conda activate RFI_Generator
 conda install numpy pandas matplotlib scipy pyyaml pytest
 ```
 
-**Optional dependencies**:
-- `openpyxl`: For Excel file support (original GUI only)
-- `pyyaml`: For YAML config files (can use JSON or CLI flags without it)
+All of these are required: `openpyxl` backs the MP-3000A GUI's Excel support and `pyyaml`
+backs the YAML configuration files.
 
 ### Step 3: Install RFIGenerator
 
@@ -158,21 +153,21 @@ cd /path/to/RFIGenerator
 pip install -e .
 ```
 
-Or for development with all optional dependencies:
+Or for development, with the test dependencies:
 ```bash
-pip install -e ".[dev,yaml,scipy]"
+pip install -e ".[dev]"
 ```
 
 ### Verify Installation
 
 Test that the CLI works:
 ```bash
-python RFIGen_2/rfigen_cli.py --help
+rfigen --help
 ```
 
-Or test the GUI:
+Or test a GUI:
 ```bash
-python RFIGen_2/Gui_app.py
+rfigen gui
 ```
 
 ## Quick Start
@@ -182,8 +177,7 @@ python RFIGen_2/Gui_app.py
 Quickest way to create a dataset:
 
 ```bash
-cd RFIGen_2
-python rfigen_cli.py generate \
+rfigen generate \
   --rfi-type narrowband \
   --center-frequency-ghz 28.0 \
   --power-k 15 \
@@ -203,8 +197,7 @@ This creates:
 For more complex setups with multiple RFI sources:
 
 ```bash
-cd RFIGen_2
-python rfigen_cli.py generate \
+rfigen generate \
   --config configs/example.yaml \
   --output outputs/example_config
 ```
@@ -214,8 +207,7 @@ python rfigen_cli.py generate \
 Create plots from an existing configuration:
 
 ```bash
-cd RFIGen_2
-python rfigen_cli.py plot \
+rfigen plot \
   --config configs/example.yaml \
   --output outputs/figures
 ```
@@ -225,8 +217,7 @@ python rfigen_cli.py plot \
 Launch the graphical interface:
 
 ```bash
-cd RFIGen_2
-python Gui_app.py
+rfigen gui
 ```
 
 Then:
@@ -240,21 +231,38 @@ Then:
 Inspect an MP-3000A CSV file:
 
 ```bash
-cd RFIGen_2
-python rfigen_cli.py inspect-csv /path/to/radiometer_data.csv
+rfigen inspect-csv /path/to/radiometer_data.csv
 ```
 
 Inject synthetic RFI into real radiometer measurements:
 
 ```bash
-cd RFIGen_2
-python rfigen_cli.py generate-from-csv \
+rfigen generate-from-csv \
   /path/to/radiometer_data.csv \
   --rfi-type pulsed \
   --center-frequency-ghz 24.0 \
   --power-k 20 \
   --output outputs/real_with_rfi
 ```
+
+### Option 6: Run the Legacy Pipeline
+
+Config-driven clean/contaminated generation with pointing-aware RFI source classes:
+
+```bash
+rfigen pipeline --config configs/legacy_base.yaml
+```
+
+### Option 7: Generate an RTTOV Level-1 File
+
+```bash
+rfigen rttov --output outputs/rttov_lv1.csv --hours 6 --seed 42
+```
+
+Note that this writes a tidy/long CSV (one row per channel per observation), which is a
+different schema from the MP-3000A wide format read by `inspect-csv` and `generate-from-csv`.
+Set `radiometry.use_rttov: true` in a legacy config to feed it straight into the pipeline,
+which reshapes it automatically.
 
 ## Project Structure
 
@@ -265,46 +273,54 @@ RFIGenerator/
 ├── requirements.txt                    # Pip dependencies
 ├── pyproject.toml                      # Package configuration
 ├── LICENSE                             # MIT License
+├── rfigen_cli.py                       # Run the CLI without installing
+├── Gui_app.py                          # Run the core GUI without installing
 │
-├── RFIGen_2/                          # Modern version (RECOMMENDED)
-│   ├── rfigen_cli.py                  # CLI entry point
-│   ├── Gui_app.py                     # GUI entry point
-│   ├── configs/
-│   │   └── example.yaml               # Example configuration
-│   ├── examples/
-│   │   └── generate_dataset.py        # Example Python script
-│   ├── src/rfigen/
-│   │   ├── cli.py                     # CLI implementation
-│   │   ├── gui.py                     # GUI implementation
-│   │   ├── config.py                  # Configuration management
-│   │   ├── dataset.py                 # Dataset generation
-│   │   ├── radiometry.py              # K-band radiometry simulation
-│   │   ├── export_data.py             # CSV/NPZ/JSON export
-│   │   ├── models/                    # RFI model implementations
-│   │   │   ├── base.py
-│   │   │   └── [model files]
-│   │   ├── visualization/             # Plotting utilities
-│   │   ├── grid.py                    # Time/frequency grid generation
-│   │   └── mixer.py                   # Signal mixing
-│   ├── tests/                         # Unit tests
-│   └── outputs/                       # Default output directory
+├── configs/
+│   ├── example.yaml                    # Core engine configuration
+│   └── legacy_base.yaml                # Legacy engine configuration
+├── data/
+│   ├── datos_radiometro/               # Real MP-3000A Level-1 measurements
+│   ├── datos_radiometro_procesados/    # Cleaned measurements
+│   └── datos_radiometro_sinteticos/    # Generated measurements
+├── docs/
+│   ├── legacy_cli.md                   # Legacy CLI notes
+│   └── legacy_config.md                # Legacy config reference
+├── examples/generate_dataset.py        # Python API example
+├── notebooks/                          # Analysis notebooks
 │
-├── src/                               # Original version
-│   ├── cli/                           # CLI interface
-│   ├── gui/
-│   │   └── gui_app.py
-│   ├── models/                        # RFI models
-│   ├── config/                        # Configuration
-│   ├── export/                        # Export utilities
-│   ├── visualization/                 # Plotting
-│   └── tests/
+├── src/rfigen/                         # The package
+│   ├── cli.py                          # Unified CLI (7 subcommands)
+│   ├── gui.py                          # Core GUI
+│   ├── config.py                       # Dataclass configuration
+│   ├── dataset.py                      # Dataset generation
+│   ├── grid.py                         # Time/frequency grids
+│   ├── mixer.py                        # Signal mixing
+│   ├── radiometry.py                   # K-band radiometry simulation
+│   ├── real_data.py                    # MP-3000A Level-1 CSV import
+│   ├── export_data.py                  # CSV/NPZ/JSON export
+│   ├── models/base.py                  # 6 parametric RFI models
+│   ├── visualization/plots.py          # Plotting utilities
+│   │
+│   └── legacy/                         # Legacy engine
+│       ├── pipeline.py                 # Config-driven pipeline
+│       ├── config_loader.py            # YAML/JSON loading
+│       ├── config_parser.py            # Defaults + validation
+│       ├── radiometry.py               # DataFrame radiometry
+│       ├── rttov.py                    # RTTOV Level-1 generator
+│       ├── rfi_generator.py            # RFI source classes
+│       ├── signal_mixer.py             # Angular-coupling mixer
+│       ├── export_data.py              # CSV/XLSX export
+│       ├── data_import.py              # Local measurement import
+│       ├── gui.py                      # Legacy GUI
+│       ├── mp3000a_gui.py              # MP-3000A real-data GUI
+│       ├── signal_gui.py               # Signal workbench GUI
+│       └── visualization/              # Time/frequency plotting
 │
-├── gui_visual.py                      # Original GUI (legacy)
-├── gausiansignal.py                   # Original utilities
-│
-├── examples/                          # Usage examples
-├── outputs/                           # Example output directory
-└── tests/                             # Root tests
+└── tests/
+    ├── test_config.py  test_dataset.py  test_real_data.py
+    ├── test_gui_smoke.py               # All four GUIs
+    └── legacy/                         # Legacy engine tests
 ```
 
 ## Getting Help
@@ -312,7 +328,7 @@ RFIGenerator/
 ### Documentation
 - **Comprehensive Guide**: See `USER_MANUAL.md` for:
   - Complete CLI command reference
-  - GUI tutorials for both versions
+  - GUI tutorials for all four interfaces
   - Configuration file format and examples
   - RFI model descriptions and parameters
   - Real data import workflows
@@ -325,7 +341,6 @@ RFIGenerator/
 Verify everything works correctly:
 
 ```bash
-cd RFIGen_2
 pytest tests/ -v
 ```
 
@@ -342,7 +357,7 @@ All tests should pass with output showing number of passing tests.
 ## Status
 
 ✅ **CLI**: Fully functional with all 5 subcommands working  
-✅ **GUI (RFIGen_2)**: Clean, responsive Tkinter interface  
+✅ **GUIs**: Four Tkinter interfaces, all installed as console scripts  
 ✅ **Visualization**: Complete time, frequency, and time-frequency domain plots  
 ✅ **Export**: CSV, NPZ, JSON, PNG formats all working  
 ✅ **Real Data**: MP-3000A CSV import and RFI injection operational  
